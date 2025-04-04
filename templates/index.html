@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarryChat  &#129497;</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Caminho correto do CSS -->
+    <!--FONT AWESOME-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!--GOOGLE FONTS-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Play&display=swap" rel="stylesheet"> 
+</head>
+<body>
+    
+    <div class="container">
+        <div class="header">
+            <t1 class="titulo" >HarryChat  &#129497;</t1>
+        </div>
+        <div id="chat" class="chat-box">
+            <div id="welcome-message" class="message-container">
+                <div class="bot-message">HarryChat &#129497;:</div>
+                <div class="message">Como posso ajudar você hoje com questões relacionadas ao universo de Harry Potter?</div>
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="input" placeholder="Digite sua pergunta...">
+            <button  class="cssbuttons-io" id="send" >Enviar</button> 
+        </div>
+    </div>  
+    <footer>
+        <div class="footer">
+        <div class="row">
+        <a href="https://www.linkedin.com/in/euller-santo-miranda-522634110/" target="_blank"><i class="fa fa-linkedin"></i></a>
+        <a href="https://www.instagram.com/euller_sant0s/" target="_blank"><i class="fa fa-instagram"></i></a>
+        <a href="https://github.com/majjoris" target="_blank"><i class="fa fa-github"></i></a>
+        </div>
+        
+        <div class="row">
+        <ul>
+        <li><a href="mailto:eullersm12@gmail.com">Entre em contado</a></li>
+        </ul>
+        </div>
+        
+        <div class="row">
+        HarryChat Copyright © 2024 - All rights reserved || Designed By: Majjoris 
+        </div>
+        </div>
+    </footer>
+
+    <script>
+function sendQuestion() {
+    const pergunta = document.getElementById('input').value.trim();
+    
+    if (pergunta === "") {
+        alert("Por favor, digite uma pergunta.");
+        return;
+    }
+    
+    const welcomeMessage = document.getElementById('welcome-message');
+    if (welcomeMessage) {
+        welcomeMessage.remove();
+    }
+
+    const chat = document.getElementById('chat');
+    
+    const userMessageDiv = document.createElement('div');
+    userMessageDiv.className = 'message-container';
+    userMessageDiv.innerHTML = `
+        
+        <div class="user-message">Você</div>
+        <div class="user-message-box">${pergunta}</div>`;
+    chat.appendChild(userMessageDiv);
+
+    const respondendoDiv = document.createElement('div');
+    respondendoDiv.className = 'message-container';
+    respondendoDiv.innerHTML = `
+        <div class="bot-message">HarryChat &#129497;:</div>
+        <div class="message">Respondendo...</div>`;
+    chat.appendChild(respondendoDiv);
+    
+    const sendButton = document.getElementById('send');
+    sendButton.disabled = true;
+
+    chat.scrollTop = chat.scrollHeight;
+
+    fetch('http://127.0.0.1:5000/pergunta', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pergunta: pergunta })
+    })
+    .then(response => response.json())
+    .then(data => {
+        respondendoDiv.remove();
+
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.className = 'message-container';
+        botMessageDiv.innerHTML = `
+            <div class="bot-message">HarryChat &#129497;:</div>
+            <div class="message">${data.resposta}</div>`;
+        chat.appendChild(botMessageDiv);
+        
+        document.getElementById('input').value = '';
+        chat.scrollTop = chat.scrollHeight;
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert("Houve um erro ao enviar a pergunta.");
+    })
+    .finally(() => {
+        sendButton.disabled = false;
+    });
+}
+
+document.getElementById('send').addEventListener('click', sendQuestion);
+
+document.getElementById('input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendQuestion();
+    }
+});
+
+
+    </script>
+</body>
+</html>
